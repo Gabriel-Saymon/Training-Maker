@@ -1,0 +1,38 @@
+/* Estilo para a fonte Inter */
+body {
+    font-family: 'Inter', sans-serif;
+    background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('../assets/images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Animação para a entrada suave dos elementos */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.7s ease-out forwards;
+}
+
+/* Animação do Spinner (indicador de carregamento) */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #3b82f6; /* Cor azul do tema */
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    animation: spin 1s linear infinite;
+    margin: 1rem auto;
+}

@@ -1,1 +1,71 @@
-!
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitGen - O Seu Treino Personalizado</title>
+    
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontes do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="text-white min-h-screen flex items-center justify-center p-4">
+
+    <main class="w-full max-w-2xl mx-auto bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700/50">
+        <!-- TELA 1: Boas-vindas -->
+        <section id="tela-inicial" class="text-center fade-in">
+            <h1 class="text-5xl md:text-6xl font-black uppercase tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">FitGen</h1>
+            <p class="mt-4 text-lg text-slate-300">A sua jornada para o treino perfeito começa agora.</p>
+            <p class="mt-2 text-slate-400">Responda a algumas perguntas e nós montaremos um plano exclusivo para si.</p>
+            <button id="btn-iniciar" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300">
+                Descobrir o meu treino
+            </button>
+        </section>
+
+        <!-- TELA 2: Questionário (Inicialmente escondida) -->
+        <section id="tela-questionario" class="hidden">
+            <div id="container-perguntas">
+                <!-- As perguntas serão injetadas aqui pelo JavaScript -->
+            </div>
+        </section>
+
+        <!-- TELA 3: Resultado (Inicialmente escondida) -->
+        <section id="tela-resultado" class="hidden">
+            <h2 class="text-3xl font-bold text-center">Aqui está o seu treino, <span id="nome-usuario" class="text-blue-400"></span>!</h2>
+            <div id="info-imc" class="mt-2 text-center text-slate-300"></div>
+            <div id="plano-de-treino" class="mt-8 space-y-6">
+                <!-- O plano de treino será injetado aqui -->
+            </div>
+             
+            <!-- RECURSO COM GEMINI API -->
+            <div id="gemini-feature" class="mt-8 text-center border-t-2 border-slate-700 pt-8">
+                <button id="btn-dicas-gemini" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
+                    ✨ Obter Dicas do Coach Virtual
+                </button>
+                <div id="spinner" class="spinner hidden"></div>
+                <div id="dicas-container" class="mt-6 p-5 bg-slate-800 rounded-lg text-left hidden prose prose-invert prose-p:my-2 prose-headings:my-3">
+                    <!-- Dicas da Gemini API aparecerão aqui -->
+                </div>
+            </div>
+
+            <button id="btn-recomecar" class="mt-8 w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
+                Começar de Novo
+            </button>
+        </section>
+    </main>
+
+    <!-- Scripts JS Externos -->
+    <!-- IMPORTANTE: `treinos.js` deve vir antes de `script.js` -->
+    <script src="js/treinos.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>
+
