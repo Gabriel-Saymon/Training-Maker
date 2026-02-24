@@ -1,38 +1,195 @@
-/* Estilo para a fonte Inter */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --cor-destaque: #ffffff; 
+    --cor-destaque-hover: #cccccc;
+    --cor-texto: #f1f5f9;
+    --cor-texto-suave: #d1d5db;
+    --cor-borda: rgba(255, 255, 255, 0.15); /* Bordas translúcidas */
+}
+
 body {
-    font-family: 'Inter', sans-serif;
-    background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('../assets/images/background.png');
+    font-family: 'Outfit', sans-serif;
+    color: var(--cor-texto);
+    overflow-x: hidden;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+}
+
+/* --- CAMADAS DE FUNDO DE TELA --- */
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    transition: transform 0.9s cubic-bezier(0.25, 1, 0.2, 1);
+    z-index: -1;
 }
 
-/* Animação para a entrada suave dos elementos */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+#bg-1 {
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.5)), url('../assets/capa-fitgen.png');
+    transform: translateX(0);
+}
+
+#bg-2 {
+    background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('../assets/fundo-2.png');
+    transform: translateX(100%); 
+}
+
+.deslizar-esquerda { transform: translateX(-100vw) !important; }
+.deslizar-centro { transform: translateX(0) !important; }
+
+/* --- BOTÃO INICIAL --- */
+@keyframes heroSlideUp {
+    0% { opacity: 0; transform: translateY(50vh); }
+    100% { opacity: 1; transform: translateY(-50%); }
+}
+
+@keyframes heroSlideUpMobile {
+    0% { opacity: 0; transform: translateY(20vh); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+#tela-inicial {
+    position: absolute;
+    top: 40%;
+    right: 15%;
+    z-index: 10;
+    animation: heroSlideUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: transform 0.9s cubic-bezier(0.25, 1, 0.2, 1), opacity 0.5s ease;
+}
+
+/* --- CARD PRINCIPAL (EXPANDIDO E INVISÍVEL) --- */
+#main-container {
+    width: 100%;
+    max-width: 80rem; /* <--- LARGURA EXPANDIDA AQUI */
+    margin: 0 auto;
+    transform: translateX(50vw);
+    opacity: 0;
+    transition: all 0.9s cubic-bezier(0.25, 1, 0.2, 1);
+    min-height: 600px;
+    padding: 2rem;
+    /* Fundo completamente transparente, apenas os itens internos terão "vidro" */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#main-container.ativo {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.modo-card {
+    display: flex !important;
+    flex-direction: column;
+}
+
+#creditos-footer {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 2rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    z-index: 50;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    #tela-inicial {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: -5rem;
+        animation: heroSlideUpMobile 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    #main-container { padding: 1rem; }
+}
+
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+#container-perguntas, #tela-resultado { transition: opacity 0.3s ease-in-out; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Impressão */
+@media print {
+    /* 1. Remove os fundos e garante que tudo seja preto no branco */
+    body, main, html { 
+        background: white !important; 
+        color: black !important; 
+        height: auto !important;
     }
-}
+    
+    /* 2. Força todas as fontes a ficarem pretas e tira as sombras do design Glassmorphism */
+    * { 
+        color: black !important; 
+        text-shadow: none !important; 
+        box-shadow: none !important; 
+        backdrop-filter: none !important; 
+    }
 
-.fade-in {
-    animation: fadeIn 0.7s ease-out forwards;
-}
+    /* 3. Esconde as imagens de fundo, botões, setas e a tela inicial */
+    .bg-layer, .nao-imprimir, #creditos-footer, #tela-inicial, #btn-prev, #btn-next { 
+        display: none !important; 
+    }
 
-/* Animação do Spinner (indicador de carregamento) */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #3b82f6; /* Cor azul do tema */
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
-    animation: spin 1s linear infinite;
-    margin: 1rem auto;
+    /* 4. Remove restrições de tamanho do container principal */
+    #main-container { 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        max-width: 100% !important; 
+        transform: none !important; 
+        opacity: 1 !important; 
+    }
+
+    /* 5. DESMONTA O CARROSSEL: Tira a altura fixa e a rolagem horizontal */
+    #carrossel-treinos { 
+        display: block !important; /* Tira o flex (lado a lado) */
+        height: auto !important;   /* Tira os 500px de altura */
+        overflow: visible !important; 
+        padding: 0 !important;
+    }
+
+    /* 6. Formata os cartões de treino para o papel */
+    .snap-center { 
+        width: 100% !important;    /* Ocupa a largura toda da folha */
+        max-width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        page-break-inside: avoid;  /* Evita que um dia de treino seja cortado ao meio na quebra de página */
+        margin-bottom: 2rem !important; /* Espaço entre um dia e outro */
+        padding: 1.5rem !important;
+        border: 2px solid #e5e7eb !important; /* Borda cinza clara para separar */
+        border-radius: 1rem !important;
+        background: transparent !important;
+    }
+
+    /* 7. Libera a lista de exercícios para crescer o quanto precisar (tira o scroll) */
+    .snap-center ul {
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    /* 8. Estilo das linhas dos exercícios no papel */
+    li {
+        page-break-inside: avoid;
+        border-bottom: 1px solid #f3f4f6 !important;
+    }
+
+    input, button { -webkit-text-fill-color: black !important; }
 }

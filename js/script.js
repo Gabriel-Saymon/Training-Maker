@@ -1,22 +1,20 @@
-// --- LÓGICA DA APLICAÇÃO ---
-
-// Selecionar os elementos do HTML com que vamos interagir
 const telaInicial = document.getElementById('tela-inicial');
 const telaQuestionario = document.getElementById('tela-questionario');
 const telaResultado = document.getElementById('tela-resultado');
 const btnIniciar = document.getElementById('btn-iniciar');
 const btnRecomecar = document.getElementById('btn-recomecar');
+const btnImprimir = document.getElementById('btn-imprimir');
 const containerPerguntas = document.getElementById('container-perguntas');
-const btnDicasGemini = document.getElementById('btn-dicas-gemini');
-const spinner = document.getElementById('spinner');
-const dicasContainer = document.getElementById('dicas-container');
+const barraProgresso = document.getElementById('barra-progresso');
+const mainContainer = document.getElementById('main-container');
 
-// Variáveis para guardar os dados do utilizador e o estado do questionário
-// ATUALIZADO: Adicionado 'genero'
-let dadosUsuario = { nome: "", peso: 0, altura: 0, frequencia: 0, genero: "", objetivo: "" };
+const bg1 = document.getElementById('bg-1');
+const bg2 = document.getElementById('bg-2');
+
+let dadosUsuario = { nome: "", peso: 0, altura: 0, genero: "", objetivo: "", experiencia: "", frequencia: 0 };
 let perguntaAtual = 0;
+const totalPerguntas = 5;
 
-// Função para calcular o IMC e retornar a classificação
 const calcularIMC = (peso, alturaCm) => {
     if (alturaCm === 0) return { imc: 0, classificacao: 'Inválida' };
     const alturaM = alturaCm / 100;
@@ -31,91 +29,107 @@ const calcularIMC = (peso, alturaCm) => {
     return { imc, classificacao };
 };
 
-// Função para montar e exibir a pergunta atual
-const mostrarPergunta = () => {
-    containerPerguntas.innerHTML = '';
-    let conteudoPergunta = '';
-    switch (perguntaAtual) {
-        case 0: // Nome, Peso, Altura
-            conteudoPergunta = `
-                <div class="fade-in space-y-4">
-                    <h3 class="text-2xl font-bold">Vamos começar! Quais são os seus dados?</h3>
-                    <div>
-                        <label for="nome" class="block mb-2 text-sm font-medium text-slate-300">O seu nome</label>
-                        <input type="text" id="nome" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ex: João" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="peso" class="block mb-2 text-sm font-medium text-slate-300">Peso (kg)</label>
-                            <input type="number" id="peso" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ex: 75" required>
-                        </div>
-                        <div>
-                            <label for="altura" class="block mb-2 text-sm font-medium text-slate-300">Altura (cm)</label>
-                            <input type="number" id="altura" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ex: 180" required>
-                        </div>
-                    </div>
-                    <button onclick="proximaPergunta()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg">Próximo</button>
-                </div>`;
-            break;
-        case 1: // Frequência
-            const { imc, classificacao } = calcularIMC(dadosUsuario.peso, dadosUsuario.altura);
-            conteudoPergunta = `
-                <div class="fade-in text-center space-y-4">
-                    <h3 class="text-2xl font-bold">Olá, ${dadosUsuario.nome}!</h3>
-                    <p class="text-lg">O seu IMC é de <strong class="text-blue-400">${imc}</strong>, o que é classificado como <strong class="text-blue-400">${classificacao}</strong>.</p>
-                    <p class="text-xl font-semibold mt-6">Com que frequência pode treinar?</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                        <button onclick="selecionarOpcao('frequencia', 2)" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">2 vezes/semana</button>
-                        <button onclick="selecionarOpcao('frequencia', 3)" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">3 vezes/semana</button>
-                        <button onclick="selecionarOpcao('frequencia', 5)" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">5 vezes/semana</button>
-                    </div>
-                </div>`;
-            break;
-        case 2: // NOVO PASSO: Género
-            conteudoPergunta = `
-                <div class="fade-in text-center space-y-4">
-                     <p class="text-xl font-semibold">Para qual género é o treino?</p>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                        <button onclick="selecionarOpcao('genero', 'masculino')" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">
-                            <span class="text-lg font-bold">Masculino</span>
-                        </button>
-                        <button onclick="selecionarOpcao('genero', 'feminino')" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">
-                            <span class="text-lg font-bold">Feminino</span>
-                        </button>
-                    </div>
-                </div>`;
-            break;
-        case 3: // Objetivo
-            conteudoPergunta = `
-                <div class="fade-in text-center space-y-4">
-                     <p class="text-xl font-semibold">Ótimo! E qual é o seu principal objetivo?</p>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                        <button onclick="selecionarOpcao('objetivo', 'hipertrofia')" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">
-                            <span class="text-lg font-bold">Hipertrofia</span>
-                            <span class="block text-sm text-slate-400">Ganho de massa muscular</span>
-                        </button>
-                        <button onclick="selecionarOpcao('objetivo', 'queima_gordura')" class="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-blue-500 p-6 rounded-lg transition-all duration-300">
-                            <span class="text-lg font-bold">Emagrecimento</span>
-                            <span class="block text-sm text-slate-400">Queima de gordura e definição</span>
-                        </button>
-                    </div>
-                </div>`;
-            break;
-    }
-    containerPerguntas.innerHTML = conteudoPergunta;
+const atualizarProgresso = () => {
+    const porcentagem = (perguntaAtual / totalPerguntas) * 100;
+    barraProgresso.style.width = `${porcentagem}%`;
 };
 
-// Função para validar e avançar para a próxima pergunta
+const mostrarPergunta = () => {
+    atualizarProgresso();
+    containerPerguntas.style.opacity = '0';
+    
+    setTimeout(() => {
+        let conteudoPergunta = '';
+        // As larguras foram expandidas (max-w-4xl) e os botões agora têm o estilo "Glassmorphism" invisível
+        switch (perguntaAtual) {
+            case 0:
+                conteudoPergunta = `
+                    <div class="fade-in space-y-8 w-full max-w-4xl mx-auto">
+                        <h3 class="text-4xl font-semibold text-center text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">Quais são os seus dados?</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block mb-3 text-lg font-medium text-texto-suave drop-shadow-md">Seu Nome</label>
+                                <input type="text" id="nome" class="bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl focus:ring-2 focus:ring-white focus:border-transparent block w-full p-6 text-xl transition-all font-medium text-white placeholder-texto-suave/50 shadow-inner" placeholder="Ex: Gabriel" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block mb-3 text-lg font-medium text-texto-suave drop-shadow-md">Peso (kg)</label>
+                                    <input type="number" id="peso" class="bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl focus:ring-2 focus:ring-white focus:border-transparent block w-full p-6 text-xl transition-all font-medium text-white placeholder-texto-suave/50 shadow-inner" placeholder="Ex: 75" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-3 text-lg font-medium text-texto-suave drop-shadow-md">Altura (cm)</label>
+                                    <input type="number" id="altura" class="bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl focus:ring-2 focus:ring-white focus:border-transparent block w-full p-6 text-xl transition-all font-medium text-white placeholder-texto-suave/50 shadow-inner" placeholder="Ex: 180" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="proximaPergunta()" class="mt-10 w-full bg-white hover:bg-gray-200 text-black font-bold py-5 px-8 text-xl rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1">Próximo Passo</button>
+                    </div>`;
+                break;
+            case 1:
+                conteudoPergunta = `
+                    <div class="fade-in text-center space-y-12 w-full">
+                         <p class="text-4xl font-semibold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">Para qual género é o treino?</p>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4 max-w-4xl mx-auto">
+                            <button onclick="selecionarOpcao('genero', 'masculino')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-12 rounded-[2rem] transition-all duration-300 shadow-2xl font-medium text-3xl text-white">Masculino</button>
+                            <button onclick="selecionarOpcao('genero', 'feminino')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-12 rounded-[2rem] transition-all duration-300 shadow-2xl font-medium text-3xl text-white">Feminino</button>
+                        </div>
+                    </div>`;
+                break;
+            case 2:
+                conteudoPergunta = `
+                    <div class="fade-in text-center space-y-12 w-full">
+                         <p class="text-4xl font-semibold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">Qual é o seu objetivo principal?</p>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4 max-w-4xl mx-auto">
+                            <button onclick="selecionarOpcao('objetivo', 'hipertrofia')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 md:p-14 rounded-[2rem] transition-all duration-300 shadow-2xl flex flex-col items-center justify-center text-white">
+                                <span class="font-semibold text-3xl">Hipertrofia</span>
+                                <span class="text-lg text-texto-suave mt-4 font-light drop-shadow-md">Foco no ganho de massa</span>
+                            </button>
+                            <button onclick="selecionarOpcao('objetivo', 'queima_gordura')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 md:p-14 rounded-[2rem] transition-all duration-300 shadow-2xl flex flex-col items-center justify-center text-white">
+                                <span class="font-semibold text-3xl">Emagrecimento</span>
+                                <span class="text-lg text-texto-suave mt-4 font-light drop-shadow-md">Queimar gordura e definir</span>
+                            </button>
+                        </div>
+                    </div>`;
+                break;
+            case 3:
+                conteudoPergunta = `
+                    <div class="fade-in text-center space-y-12 w-full">
+                         <p class="text-4xl font-semibold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">Qual o seu nível de experiência?</p>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4 max-w-4xl mx-auto">
+                            <button onclick="selecionarOpcao('experiencia', 'iniciante')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 md:p-14 rounded-[2rem] transition-all duration-300 shadow-2xl text-white">
+                                <span class="font-semibold text-3xl">Iniciante</span><br><span class="block text-lg text-texto-suave font-light mt-4 drop-shadow-md">Começando agora ou a regressar</span>
+                            </button>
+                            <button onclick="selecionarOpcao('experiencia', 'avancado')" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 md:p-14 rounded-[2rem] transition-all duration-300 shadow-2xl text-white">
+                                <span class="font-semibold text-3xl">Avançado</span><br><span class="block text-lg text-texto-suave font-light mt-4 drop-shadow-md">Treino pesado e com constância</span>
+                            </button>
+                        </div>
+                    </div>`;
+                break;
+            case 4:
+                conteudoPergunta = `
+                    <div class="fade-in text-center space-y-12 w-full">
+                        <p class="text-4xl font-semibold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">Quantos dias na academia?</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 max-w-4xl mx-auto">
+                            <button onclick="selecionarOpcao('frequencia', 2)" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 rounded-[2rem] transition-all duration-300 shadow-2xl font-medium text-4xl text-white">2x</button>
+                            <button onclick="selecionarOpcao('frequencia', 3)" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 rounded-[2rem] transition-all duration-300 shadow-2xl font-medium text-4xl text-white">3x</button>
+                            <button onclick="selecionarOpcao('frequencia', 5)" class="bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 hover:border-white/40 p-10 rounded-[2rem] transition-all duration-300 shadow-2xl font-medium text-4xl text-white">5x</button>
+                        </div>
+                    </div>`;
+                break;
+        }
+        
+        containerPerguntas.innerHTML = conteudoPergunta;
+        containerPerguntas.style.opacity = '1';
+    }, 300);
+};
+
 window.proximaPergunta = () => {
     if (perguntaAtual === 0) {
         const nome = document.getElementById('nome').value;
         const peso = parseFloat(document.getElementById('peso').value);
         const altura = parseFloat(document.getElementById('altura').value);
 
-        if (!nome || !peso || !altura || peso <= 0 || altura <= 0) {
-            alert("Por favor, preencha todos os campos com valores válidos.");
-            return;
-        }
+        if (!nome || !peso || !altura) return alert("Preencha todos os campos para continuar!");
         dadosUsuario.nome = nome;
         dadosUsuario.peso = peso;
         dadosUsuario.altura = altura;
@@ -124,125 +138,107 @@ window.proximaPergunta = () => {
     mostrarPergunta();
 };
 
-// Função chamada quando o utilizador clica num botão de opção
 window.selecionarOpcao = (chave, valor) => {
     dadosUsuario[chave] = valor;
     perguntaAtual++;
-    // ATUALIZADO: Agora o final é na pergunta 4 (índice 3)
-    if (perguntaAtual > 3) {
+    if (perguntaAtual >= totalPerguntas) {
         gerarTreino();
     } else {
         mostrarPergunta();
     }
 };
 
-// Função para gerar e exibir o plano de treino final
 const gerarTreino = () => {
-    // ATUALIZADO: Inclui 'genero' para selecionar o treino
-    const { nome, objetivo, frequencia, genero, peso, altura } = dadosUsuario;
-    // A variável `treinos` vem do arquivo `treinos.js`
-    const plano = treinos[genero][objetivo][frequencia];
+    const { nome, objetivo, experiencia, frequencia, genero, peso, altura } = dadosUsuario;
+    const plano = treinos[genero]?.[objetivo]?.[experiencia]?.[frequencia];
     
     document.getElementById('nome-usuario').textContent = nome;
     const { imc, classificacao } = calcularIMC(peso, altura);
-    document.getElementById('info-imc').innerHTML = `O seu IMC é <strong>${imc}</strong> (${classificacao}).`;
+    document.getElementById('info-imc').innerHTML = `IMC: <strong>${imc}</strong> <span class="text-texto-suave mx-2">|</span> ${classificacao}`;
+    
     const containerPlano = document.getElementById('plano-de-treino');
     containerPlano.innerHTML = '';
 
-    plano.forEach(treinoDoDia => {
-        const exerciciosHtml = treinoDoDia.exercicios.map(ex => `
-            <li class="flex justify-between items-center py-3 border-b border-slate-700">
-                <div>
-                    <p class="font-semibold">${ex.nome}</p>
-                    <p class="text-sm text-slate-400">${ex.series} | Descanso: ${ex.descanso}</p>
-                </div>
-                <a href="${ex.video}" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">
-                    <svg xmlns="http://www.w.3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.66 5.2a1 1 0 0 0-1.79.89V18a1 1 0 0 0 1.58.81l7.43-6a1 1 0 0 0 0-1.62Z"></path></svg>
-                </a>
-            </li>`).join('');
+    if(!plano) {
+        containerPlano.innerHTML = '<div class="flex h-full items-center justify-center"><p class="text-red-400 font-medium text-center bg-black/60 backdrop-blur-md p-8 rounded-3xl border border-red-900/50 text-lg max-w-xl shadow-2xl">Treino não encontrado para esta combinação. Verifique se atualizou o ficheiro treinos.js.</p></div>';
+    } else {
+        let htmlTreinos = `
+            <div class="flex items-center justify-center gap-3 mb-4 text-white text-sm font-medium nao-imprimir fade-in flex-shrink-0 drop-shadow-md">
+                <span class="tracking-wide">Deslize para ver os outros dias</span>
+            </div>
+            
+            <div class="relative group w-full fade-in h-full flex items-center">
+                <button id="btn-prev" class="nao-imprimir absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 md:-translate-x-12 bg-black/60 backdrop-blur-sm text-white p-5 rounded-full shadow-2xl border border-white/20 z-20 hidden md:flex items-center justify-center hover:bg-white hover:text-black transition-all transform hover:scale-110">
+                    <svg xmlns="http://www.w.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
 
-        const cardDia = `
-            <div class="bg-slate-800/80 p-6 rounded-lg shadow-lg fade-in">
-                <h3 class="text-xl font-bold text-blue-400 mb-4">${treinoDoDia.dia}</h3>
-                <ul class="space-y-2">
-                    ${exerciciosHtml}
-                </ul>
-            </div>`;
-        containerPlano.innerHTML += cardDia;
-    });
+                <div id="carrossel-treinos" class="flex overflow-x-auto snap-x snap-mandatory gap-8 px-2 hide-scrollbar w-full scroll-smooth h-[500px] items-stretch py-4">
+        `;
+
+        plano.forEach(treinoDoDia => {
+            const exerciciosHtml = treinoDoDia.exercicios.map(ex => `
+                <li class="flex justify-between items-center py-5 border-b border-white/10 last:border-0 pointer-events-none">
+                    <div class="pr-3">
+                        <p class="font-semibold text-white text-lg pointer-events-auto leading-tight drop-shadow-md">${ex.nome}</p>
+                        <p class="text-sm text-texto-suave mt-1 font-light pointer-events-auto tracking-wide drop-shadow-sm">${ex.series} • Desc: ${ex.descanso}</p>
+                    </div>
+                    ${ex.video !== "#" ? `<a href="${ex.video}" target="_blank" class="nao-imprimir shrink-0 bg-black/40 hover:bg-white hover:text-black text-white p-3 rounded-xl border border-white/20 transition-all pointer-events-auto hover:scale-105 shadow-lg" title="Ver execução">▶️</a>` : ''}
+                </li>`).join('');
+
+            // CARTÃO DE TREINO INDIVIDUAL COM FUNDO FOSCO
+            htmlTreinos += `
+                <div class="snap-center shrink-0 w-[85%] sm:w-[60%] lg:w-[40%] bg-black/50 backdrop-blur-xl border border-white/10 p-8 md:p-10 rounded-[2.5rem] shadow-2xl transition-all duration-300 flex flex-col h-full select-none relative overflow-hidden group hover:border-white/30">
+                    <h3 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 drop-shadow-lg">${treinoDoDia.dia}</h3>
+                    <ul class="space-y-1 flex-1 overflow-y-auto hide-scrollbar pr-2">${exerciciosHtml}</ul>
+                </div>`;
+        });
+
+        htmlTreinos += `
+                </div>
+                
+                <button id="btn-next" class="nao-imprimir absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 md:translate-x-12 bg-black/60 backdrop-blur-sm text-white p-5 rounded-full shadow-2xl border border-white/20 z-20 hidden md:flex items-center justify-center hover:bg-white hover:text-black transition-all transform hover:scale-110">
+                    <svg xmlns="http://www.w.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            </div>
+        `;
+
+        containerPlano.innerHTML = htmlTreinos;
+
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const carrossel = document.getElementById('carrossel-treinos');
+
+        if (btnPrev && btnNext && carrossel) {
+            btnNext.addEventListener('click', () => {
+                carrossel.scrollBy({ left: carrossel.clientWidth * 0.5, behavior: 'smooth' });
+            });
+            btnPrev.addEventListener('click', () => {
+                carrossel.scrollBy({ left: -(carrossel.clientWidth * 0.5), behavior: 'smooth' });
+            });
+        }
+    }
+
     telaQuestionario.classList.add('hidden');
     telaResultado.classList.remove('hidden');
+    telaResultado.classList.add('flex');
 };
 
-// --- LÓGICA DA API GEMINI ---
+btnIniciar.addEventListener('click', () => { 
+    telaInicial.classList.add('deslizar-esquerda');
+    telaInicial.style.opacity = '0';
+    bg1.classList.add('deslizar-esquerda');
+    bg2.classList.add('deslizar-centro');
 
-function formatarRespostaGemini(text) {
-     return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
-}
-
-async function getGeminiTips() {
-    spinner.classList.remove('hidden');
-    dicasContainer.classList.add('hidden');
-    btnDicasGemini.disabled = true;
-
-    const apiKey = "";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-    const { imc, classificacao } = calcularIMC(dadosUsuario.peso, dadosUsuario.altura);
-    const objetivoTraduzido = dadosUsuario.objetivo === 'hipertrofia' ? 'ganho de massa muscular (hipertrofia)' : 'emagrecimento e queima de gordura';
-    
-    // ATUALIZADO: O prompt agora inclui o género do utilizador.
-    const prompt = `Aja como um personal trainer e nutricionista motivacional. Um utilizador do género ${dadosUsuario.genero}, com o objetivo de ${objetivoTraduzido}, que treina ${dadosUsuario.frequencia} vezes por semana e tem um IMC de ${imc} (${classificacao}), pediu dicas. Forneça 3 dicas curtas, práticas e fáceis de seguir para maximizar os seus resultados. Use uma linguagem encorajadora e amigável. Formate a resposta com títulos para cada dica usando **negrito**. Responda em português.`;
-    
-    const payload = { contents: [{ parts: [{ text: prompt }] }], };
-    
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) { throw new Error(`Erro na API: ${response.statusText}`); }
-        const result = await response.json();
-        const candidate = result.candidates?.[0];
-
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-            const textoGerado = candidate.content.parts[0].text;
-            dicasContainer.innerHTML = formatarRespostaGemini(textoGerado);
-            dicasContainer.classList.remove('hidden');
-        } else {
-            dicasContainer.innerHTML = "<p>Não foi possível obter as dicas no momento. Tente novamente mais tarde.</p>";
-            dicasContainer.classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error("Erro ao chamar a Gemini API:", error);
-        dicasContainer.innerHTML = `<p>Ocorreu um erro ao buscar as suas dicas. Verifique a sua conexão ou tente novamente. (${error.message})</p>`;
-        dicasContainer.classList.remove('hidden');
-    } finally {
-        spinner.classList.add('hidden');
-        btnDicasGemini.disabled = false;
-    }
-}
-
-// --- EVENT LISTENERS ---
-// "Ouvintes" que reagem aos cliques do utilizador
-
-btnDicasGemini.addEventListener('click', getGeminiTips);
-
-btnIniciar.addEventListener('click', () => {
-    telaInicial.classList.add('hidden');
-    telaQuestionario.classList.remove('hidden');
+    mainContainer.classList.remove('hidden');
+    telaQuestionario.classList.remove('hidden'); 
+    telaQuestionario.classList.add('flex');
     mostrarPergunta();
+
+    setTimeout(() => {
+        mainContainer.classList.add('ativo');
+        mainContainer.classList.add('modo-card');
+    }, 50);
 });
 
-btnRecomecar.addEventListener('click', () => {
-    // ATUALIZADO: Limpa a variável 'genero' ao recomeçar
-    dadosUsuario = { nome: "", peso: 0, altura: 0, frequencia: 0, genero: "", objetivo: "" };
-    perguntaAtual = 0;
-    dicasContainer.classList.add('hidden');
-    dicasContainer.innerHTML = '';
-    telaResultado.classList.add('hidden');
-    telaInicial.classList.remove('hidden');
-    telaQuestionario.classList.add('hidden');
-});
+btnImprimir.addEventListener('click', () => { window.print(); });
+btnRecomecar.addEventListener('click', () => { location.reload(); });

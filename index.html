@@ -4,68 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitGen - O Seu Treino Personalizado</title>
-    
-    <!-- CSS Externo -->
     <link rel="stylesheet" href="css/style.css">
-
-    <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Fontes do Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        destaque: 'var(--cor-destaque)',
+                        'destaque-hover': 'var(--cor-destaque-hover)',
+                        texto: 'var(--cor-texto)',
+                        'texto-suave': 'var(--cor-texto-suave)',
+                        borda: 'var(--cor-borda)',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="text-white min-h-screen flex items-center justify-center p-4">
+<body class="p-4 lg:p-8">
 
-    <main class="w-full max-w-2xl mx-auto bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700/50">
-        <!-- TELA 1: Boas-vindas -->
-        <section id="tela-inicial" class="text-center fade-in">
-            <h1 class="text-5xl md:text-6xl font-black uppercase tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">FitGen</h1>
-            <p class="mt-4 text-lg text-slate-300">A sua jornada para o treino perfeito começa agora.</p>
-            <p class="mt-2 text-slate-400">Responda a algumas perguntas e nós montaremos um plano exclusivo para si.</p>
-            <button id="btn-iniciar" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300">
-                Descobrir o meu treino
-            </button>
+    <div id="bg-1" class="bg-layer nao-imprimir"></div>
+    <div id="bg-2" class="bg-layer nao-imprimir"></div>
+
+    <section id="tela-inicial" class="nao-imprimir">
+        <button id="btn-iniciar" class="bg-neutral-900/60 backdrop-blur-md border border-white/20 hover:bg-white/10 hover:border-white/50 text-white text-2xl md:text-4xl font-light tracking-widest uppercase px-10 py-6 rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.8)] transition-all duration-500 transform hover:scale-105">
+            Montar Treino
+        </button>
+    </section>
+
+    <main id="main-container" class="hidden area-impressao relative">
+        
+        <section id="tela-questionario" class="hidden nao-imprimir h-full flex-col">
+            <header class="text-center mb-8">
+                <h1 class="text-5xl font-bold uppercase tracking-tight text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">FitGen</h1>
+                <p class="text-sm text-texto-suave font-medium tracking-widest uppercase mt-2 drop-shadow-lg">Personal Training AI</p>
+            </header>
+            
+            <div class="w-full max-w-4xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 rounded-full h-2 mb-12 shadow-inner">
+                <div id="barra-progresso" class="bg-white h-2 rounded-full transition-all duration-700 ease-out shadow-[0_0_15px_rgba(255,255,255,0.8)]" style="width: 0%"></div>
+            </div>
+            <div id="container-perguntas" class="w-full flex-1 flex items-center"></div>
         </section>
 
-        <!-- TELA 2: Questionário (Inicialmente escondida) -->
-        <section id="tela-questionario" class="hidden">
-            <div id="container-perguntas">
-                <!-- As perguntas serão injetadas aqui pelo JavaScript -->
-            </div>
-        </section>
+        <section id="tela-resultado" class="hidden h-full flex-col">
+             <header class="text-center mb-6 nao-imprimir">
+                <h1 class="text-3xl font-bold uppercase tracking-tight text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">FitGen</h1>
+            </header>
 
-        <!-- TELA 3: Resultado (Inicialmente escondida) -->
-        <section id="tela-resultado" class="hidden">
-            <h2 class="text-3xl font-bold text-center">Aqui está o seu treino, <span id="nome-usuario" class="text-blue-400"></span>!</h2>
-            <div id="info-imc" class="mt-2 text-center text-slate-300"></div>
-            <div id="plano-de-treino" class="mt-8 space-y-6">
-                <!-- O plano de treino será injetado aqui -->
+            <div class="text-center fade-in max-w-4xl mx-auto mb-8 flex-shrink-0">
+                <h2 class="text-3xl md:text-5xl font-bold text-white leading-tight drop-shadow-2xl">Seu treino está pronto,<br><span id="nome-usuario" class="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"></span>!</h2>
+                <div id="info-imc" class="mt-6 inline-block px-6 py-2 rounded-full text-lg font-medium bg-black/50 backdrop-blur-md text-white border border-white/20 shadow-xl"></div>
             </div>
+            
+            <div id="plano-de-treino" class="flex-1 relative w-full"></div>
              
-            <!-- RECURSO COM GEMINI API -->
-            <div id="gemini-feature" class="mt-8 text-center border-t-2 border-slate-700 pt-8">
-                <button id="btn-dicas-gemini" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
-                    ✨ Obter Dicas do Coach Virtual
+            <div class="mt-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 nao-imprimir fade-in flex-shrink-0 w-full">
+                <button id="btn-imprimir" class="w-full bg-black/40 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-medium py-5 px-6 text-xl rounded-3xl transition-all duration-300 shadow-2xl">
+                    Salvar PDF
                 </button>
-                <div id="spinner" class="spinner hidden"></div>
-                <div id="dicas-container" class="mt-6 p-5 bg-slate-800 rounded-lg text-left hidden prose prose-invert prose-p:my-2 prose-headings:my-3">
-                    <!-- Dicas da Gemini API aparecerão aqui -->
-                </div>
+                <button id="btn-recomecar" class="w-full bg-white hover:bg-gray-200 text-black font-bold py-5 px-6 text-xl rounded-3xl shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all duration-300 transform hover:-translate-y-1">
+                    Começar de Novo
+                </button>
             </div>
-
-            <button id="btn-recomecar" class="mt-8 w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300">
-                Começar de Novo
-            </button>
         </section>
     </main>
 
-    <!-- Scripts JS Externos -->
-    <!-- IMPORTANTE: `treinos.js` deve vir antes de `script.js` -->
+    <div id="creditos-footer" class="nao-imprimir">
+        Developed by Gabriel Saymon
+    </div>
+
     <script src="js/treinos.js"></script>
     <script src="js/script.js"></script>
-
 </body>
 </html>
-
