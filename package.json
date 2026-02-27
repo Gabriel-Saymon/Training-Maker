@@ -1,0 +1,12 @@
+{
+  "name": "fitgen-ai",
+  "version": "1.0.0",
+  "description": "Personal Training AI",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo 'Vercel vai servir a pasta raiz'"
+  },
+  "dependencies": {
+    "openai": "^4.28.0"
+  }
+}
