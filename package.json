@@ -7,6 +7,6 @@
     "start": "echo 'Vercel vai servir a pasta raiz'"
   },
   "dependencies": {
-    "openai": "^4.28.0"
+    "@google/generative-ai": "^0.21.0"
   }
 }
